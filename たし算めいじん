@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>たしざんレンシュウ！ | 10のかたまりをつくろう</title>
+    
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fontsの読み込み（M PLUS Rounded 1c） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* M PLUS Rounded 1cフォントを全体に適用 */
+        body {
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+        }
+        /* 数字入力欄のスタイル */
+        .num-input {
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 800;
+            border: 3px solid #9ca3af;
+            border-radius: 0.5rem;
+            color: #1e40af;
+            transition: all 0.2s;
+        }
+        .num-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.3);
+        }
+        /* 答え合わせボタンのスタイル */
+        .check-btn {
+            padding: 0.75rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(to top, #f97316, #fb923c);
+            border-radius: 0.75rem;
+            border-bottom: 5px solid #ea580c;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.1s ease-in-out;
+        }
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .check-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom-width: 2px;
+        }
+        /* 次の問題へボタンのスタイル */
+        .next-btn {
+            padding: 0.75rem 2rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            background: linear-gradient(to top, #22c55e, #4ade80);
+            border-radius: 0.75rem;
+            border-bottom: 5px solid #16a34a;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.1s ease-in-out;
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .next-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom-width: 2px;
+        }
+    </style>
+</head>
+<body class="bg-blue-100 flex items-center justify-center min-h-screen">
+
+    <div class="container mx-auto p-4 max-w-2xl">
+        <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+            
+            <header class="text-center mb-6">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-blue-800">たしざんレンシュウ！</h1>
+                <p class="text-lg md:text-xl text-blue-600 font-bold mt-1">～10のかたまりをつくろう～</p>
+            </header>
+
+            <main>
+                <!-- 問題表示エリア -->
+                <div id="problem-display" class="bg-blue-50 border-4 border-blue-200 rounded-xl p-4 text-center mb-6">
+                    <p class="text-xl text-gray-700 mb-2">もんだい</p>
+                    <p id="problem-text" class="text-5xl md:text-6xl font-extrabold text-gray-800 tracking-wider"></p>
+                </div>
+
+                <!-- ステップ表示エリア -->
+                <div id="steps-container" class="space-y-6">
+                    <!-- ステップ1: 10の相方を見つける -->
+                    <div id="step1" class="bg-amber-50 p-5 rounded-lg border-2 border-amber-200">
+                        <p class="text-lg font-bold text-amber-800 mb-3">
+                            <span class="bg-amber-500 text-white rounded-full px-3 py-1 mr-2">1</span>
+                            まず、<span id="s1-num1" class="font-extrabold text-2xl"></span> を10にしよう！
+                        </p>
+                        <div class="flex items-center justify-center space-x-2 text-3xl font-bold text-gray-700">
+                            <span id="s1-num1-2" class="text-blue-800"></span>
+                            <span>+</span>
+                            <input type="number" id="s1-input" class="num-input">
+                            <span>=</span>
+                            <span>10</span>
+                        </div>
+                    </div>
+
+                    <!-- ステップ2: もう片方の数を分ける -->
+                    <div id="step2" class="bg-sky-50 p-5 rounded-lg border-2 border-sky-200 hidden">
+                        <p class="text-lg font-bold text-sky-800 mb-3">
+                            <span class="bg-sky-500 text-white rounded-full px-3 py-1 mr-2">2</span>
+                            いいね！その<span id="s2-split-num1" class="font-extrabold text-2xl text-amber-600"></span>を <span id="s2-num2" class="font-extrabold text-2xl"></span> から借りよう！
+                        </p>
+                        <div class="flex items-center justify-center space-x-2 text-3xl font-bold text-gray-700">
+                             <span id="s2-num2-2" class="text-blue-800"></span>
+                            <span class="text-xl">は、</span>
+                            <span id="s2-split-num1-2" class="text-amber-600"></span>
+                            <span class="text-xl">と</span>
+                            <input type="number" id="s2-input" class="num-input">
+                             <span class="text-xl">にわけられるね</span>
+                        </div>
+                    </div>
+
+                    <!-- ステップ3: 最後の足し算 -->
+                    <div id="step3" class="bg-emerald-50 p-5 rounded-lg border-2 border-emerald-200 hidden">
+                        <p class="text-lg font-bold text-emerald-800 mb-3">
+                            <span class="bg-emerald-500 text-white rounded-full px-3 py-1 mr-2">3</span>
+                            さいごに、のこりをたそう！
+                        </p>
+                        <div class="flex items-center justify-center space-x-2 text-3xl font-bold text-gray-700">
+                            <span>10</span>
+                            <span>+</span>
+                            <span id="s3-split-num2"></span>
+                            <span>=</span>
+                            <input type="number" id="s3-input" class="num-input">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メッセージとボタンエリア -->
+                <div class="mt-6 text-center">
+                    <div id="message-box" class="h-12 flex items-center justify-center">
+                        <p id="message-text" class="text-xl font-bold"></p>
+                    </div>
+                    <button id="check-button" class="check-btn">こたえあわせ</button>
+                    <button id="next-button" class="next-btn hidden">つぎのもんだいへ</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // === DOM要素の取得 ===
+        const problemText = document.getElementById('problem-text');
+        const messageText = document.getElementById('message-text');
+        const checkButton = document.getElementById('check-button');
+        const nextButton = document.getElementById('next-button');
+
+        // ステップ1
+        const step1 = document.getElementById('step1');
+        const s1_num1 = document.getElementById('s1-num1');
+        const s1_num1_2 = document.getElementById('s1-num1-2');
+        const s1_input = document.getElementById('s1-input');
+
+        // ステップ2
+        const step2 = document.getElementById('step2');
+        const s2_split_num1 = document.getElementById('s2-split-num1');
+        const s2_num2 = document.getElementById('s2-num2');
+        const s2_num2_2 = document.getElementById('s2-num2-2');
+        const s2_split_num1_2 = document.getElementById('s2-split-num1-2');
+        const s2_input = document.getElementById('s2-input');
+
+        // ステップ3
+        const step3 = document.getElementById('step3');
+        const s3_split_num2 = document.getElementById('s3-split-num2');
+        const s3_input = document.getElementById('s3-input');
+
+        // === 問題の状態を管理する変数 ===
+        let num1, num2, answer, splitNum1, splitNum2;
+        let currentStep = 1;
+
+        // === 関数 ===
+
+        /**
+         * 新しい問題を作成して表示する
+         */
+        function generateProblem() {
+            // 繰り上がりが必ず発生する1桁の数字の組み合わせを生成
+            do {
+                num1 = Math.floor(Math.random() * 8) + 2; // 2から9
+                num2 = Math.floor(Math.random() * 8) + 2; // 2から9
+            } while (num1 + num2 <= 10);
+
+            answer = num1 + num2;
+            splitNum1 = 10 - num1; // 10を作るために必要な数 (num1の補数)
+            splitNum2 = num2 - splitNum1; // 残りの数
+
+            // UIを初期状態にリセット
+            currentStep = 1;
+            problemText.textContent = `${num1} + ${num2} = ?`;
+            
+            // ステップ1の表示設定
+            step1.classList.remove('hidden');
+            s1_num1.textContent = num1;
+            s1_num1_2.textContent = num1;
+            s1_input.value = '';
+
+            // ステップ2と3を隠す
+            step2.classList.add('hidden');
+            step3.classList.add('hidden');
+
+            // メッセージとボタンのリセット
+            messageText.textContent = '';
+            checkButton.classList.remove('hidden');
+            nextButton.classList.add('hidden');
+            
+            // 最初の入力欄にフォーカス
+            s1_input.focus();
+        }
+
+        /**
+         * 「こたえあわせ」ボタンが押されたときの処理
+         */
+        function checkAnswer() {
+            messageText.textContent = ''; // メッセージをクリア
+
+            if (currentStep === 1) {
+                const val = parseInt(s1_input.value);
+                // 正解条件: 入力した数が、10を作るための正しい数であること
+                if (val === splitNum1) {
+                    showSuccessAndMoveNext(2);
+                } else {
+                    showError(`${num1}といくつで10になるかな？`);
+                }
+            } else if (currentStep === 2) {
+                const val = parseInt(s2_input.value);
+                // 正解条件: 入力した数が、num2を分けた残りの数として正しいこと
+                if (val === splitNum2) {
+                    showSuccessAndMoveNext(3);
+                } else {
+                    showError(`${num2}は ${splitNum1}と いくつにわけられるかな？`);
+                }
+            } else if (currentStep === 3) {
+                const val = parseInt(s3_input.value);
+                // 正解条件: 最終的な答えが正しいこと
+                if (val === answer) {
+                    showFinalSuccess();
+                } else {
+                    showError(`あとすこし！10と${splitNum2}をたすと…？`);
+                }
+            }
+        }
+        
+        /**
+         * 正解時の処理と次のステップへの移行
+         * @param {number} nextStep - 次に表示するステップ番号
+         */
+        function showSuccessAndMoveNext(nextStep) {
+            messageText.textContent = 'ピンポーン！そのちょうし！';
+            messageText.className = 'text-xl font-bold text-green-600';
+            
+            // 0.8秒後に次のステップを表示
+            setTimeout(() => {
+                messageText.textContent = '';
+                if (nextStep === 2) {
+                    step1.classList.add('hidden');
+                    step2.classList.remove('hidden');
+                    // ステップ2の数字を設定
+                    s2_split_num1.textContent = splitNum1;
+                    s2_num2.textContent = num2;
+                    s2_num2_2.textContent = num2;
+                    s2_split_num1_2.textContent = splitNum1;
+                    s2_input.value = '';
+                    s2_input.focus();
+                } else if (nextStep === 3) {
+                    step2.classList.add('hidden');
+                    step3.classList.remove('hidden');
+                    // ステップ3の数字を設定
+                    s3_split_num2.textContent = splitNum2;
+                    s3_input.value = '';
+                    s3_input.focus();
+                }
+                currentStep = nextStep;
+            }, 800);
+        }
+
+        /**
+         * 最終問題正解時の処理
+         */
+        function showFinalSuccess() {
+            problemText.textContent = `${num1} + ${num2} = ${answer}`;
+            messageText.innerHTML = '🎉 せいかい！かんぺきだね！ 🎉';
+            messageText.className = 'text-xl font-bold text-orange-500';
+            step3.classList.add('hidden');
+            checkButton.classList.add('hidden');
+            nextButton.classList.remove('hidden');
+        }
+
+        /**
+         * 不正解時の処理
+         * @param {string} msg - 表示するエラーメッセージ
+         */
+        function showError(msg) {
+            messageText.textContent = '🤔 ' + msg;
+            messageText.className = 'text-xl font-bold text-red-600';
+        }
+
+        // === イベントリスナーの設定 ===
+        checkButton.addEventListener('click', checkAnswer);
+        nextButton.addEventListener('click', generateProblem);
+        
+        // Enterキーで答え合わせができるようにする
+        document.querySelectorAll('.num-input').forEach(input => {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+        });
+
+        // ページの読み込み完了時に最初の問題を作成
+        window.onload = generateProblem;
+    </script>
+</body>
+</html>
